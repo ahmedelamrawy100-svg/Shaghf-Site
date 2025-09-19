@@ -1,0 +1,11 @@
+body { font-family: Arial, sans-serif; margin:0; padding:0; background:#f7f7f7; direction:rtl; }
+.navbar { display:flex; gap:15px; background:#222; color:white; padding:10px; align-items:center; }
+.navbar a { color:white; text-decoration:none; font-weight:bold; }
+.page { padding:20px; }
+.product-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:15px; }
+.product-card { background:white; padding:15px; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,0.2); }
+.product-card img { width:100%; border-radius:10px; }
+#authModal { position:fixed; top:0;left:0;right:0;bottom:0; background:rgba(0,0,0,0.7); display:flex; justify-content:center; align-items:center; }
+#authModal .modal-content { background:white; padding:20px; border-radius:10px; width:300px; text-align:center; }
+input, textarea, button { margin:5px 0; padding:8px; width:90%; border-radius:5px; }
+button { cursor:pointer; background:linear-gradient(90deg,#ff7e5f,#feb47b); color:white; border:none; }

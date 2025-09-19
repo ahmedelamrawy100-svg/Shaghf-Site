@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>شغف</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; font-family: Arial, sans-serif; }
+body { background:#f7f7f7; direction:rtl; color:#333; }
+.container { max-width:1200px; margin:auto; padding:20px; }
+.navbar { background:#ff7e5f; display:flex; gap:20px; padding:15px; border-radius:10px; }
+.navbar a { color:white; text-decoration:none; font-weight:bold; cursor:pointer; }
+.navbar a:hover { text-decoration:underline; }
+.hero { text-align:center; padding:50px; background:#feb47b; border-radius:15px; margin-top:20px; }
+.hero h1 { font-size:2.5em; margin-bottom:10px; }
+.page { display:none; margin-top:20px; }
+.page.active { display:block; }
+.main { display:flex; flex-wrap:wrap; gap:20px; justify-content:center; }
+.card { background:white; padding:15px; border-radius:10px; width:250px; box-shadow:0 5px 10px rgba(0,0,0,0.1); position:relative; }
+.card img { width:100%; border-radius:10px; }
+.card button { background:#ff7e5f; color:white; border:none; padding:10px; margin-top:10px; cursor:pointer; border-radius:8px; width:100%; }
+.card button:hover { background:#feb47b; }
+.owner-btns { display:flex; justify-content:space-between; gap:5px; margin-top:5px; }
+.modal { position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.7); display:flex; justify-content:center; align-items:center; display:none; z-index:1000; }
+.modal-content { background:white; padding:30px; border-radius:15px; width:350px; text-align:center; }
+.modal-content input { width:80%; padding:10px; margin:10px 0; border-radius:8px; border:1px solid #ccc; }
+.modal-content button { padding:10px 20px; border:none; border-radius:8px; background:#ff7e5f; color:white; cursor:pointer; margin-top:10px; }
+.checkbox-label { font-size:0.9em; cursor:pointer; display:flex; justify-content:center; gap:5px; align-items:center; }
+input[type="file"] { border:none; padding:5px; }
+@media(max-width:768px){ .navbar { flex-direction:column; gap:10px; } }
+</style>
+</head>
+<body>
+<div class="container">
+  <!-- Navbar -->
+  <div class="navbar">
+    <a onclick="showPage('home')">Home</a>
+    <a onclick="showPage('products')">Products</a>
+    <a onclick="showPage('cart')">Cart</a>
+    <a onclick="showPage('about')">About Us</a>
+    <a onclick="showPage('contact')">Contact</a>
+    <a onclick="logout()">Logout</a>
+  </div>
+
+  <!-- Home -->
+  <div class="hero page active" id="home">
+    <h1>مرحبا بك في شغف</h1>
+    <p>أفضل تجربة تسوق. استعرض منتجاتنا بسهولة ويسر.</p>
+  </div>
+
+  <!-- Products -->
+  <div class="page" id="products">
+    <h2>منتجاتنا</h2>
+    <div class="main" id="productList"></div>
+
+    <!-- Owner Section -->
+    <div id="ownerSection" style="display:none; margin-top:20px;">
+      <h3>رفع منتجات (Owner فقط)</h3>
+      <input type="text" id="prodName" placeholder="اسم المنتج"><br>
+      <input type="text" id="prodDesc" placeholder="وصف المنتج"><br>
+      <input type="number" id="prodPrice" placeholder="السعر"><br>
+      <input type="file" id="prodImage"><br>
+      <button onclick="addProduct()">أضف المنتج</button>
+    </div>
+  </div>
+
+  <!-- Cart -->
+  <div class="page" id="cart">
+    <h2>عربة التسوق</h2>
+    <div id="cartList"></div>
+  </div>
+
+  <!-- About -->
+  <div class="page" id="about">
+    <h2>عن شغف</h2>
+    <p>نحن نقدم أفضل المنتجات لتجربة تسوق رائعة ومريحة. هدفنا هو أن يكون لديك كل ما تحتاجه بسهولة وأناقة.</p>
+  </div>
+
+  <!-- Contact -->
+  <div class="page" id="contact">
+    <h2>اتصل بنا</h2>
+    <input type="text" id="contactName" placeholder="الاسم"><br>
+    <input type="email" id="contactEmail" placeholder="البريد الإلكتروني"><br>
+    <textarea id="contactMessage" placeholder="الرسالة" style="width:80%;height:100px;"></textarea><br>
+    <button onclick="sendContact()">إرسال</button>
+  </div>
+</div>
+
+<!-- Sign In Modal -->
+<div class="modal" id="signInModal">
+  <div class="modal-content">
+    <h2>تسجيل الدخول</h2>
+    <input type="text" id="username" placeholder="اسم المستخدم"><br>
+    <input type="password" id="password" placeholder="كلمة المرور"><br>
+    <label class="checkbox-label"><input type="checkbox" id="showPass">اظهار كلمة المرور</label>
+    <button onclick="signIn()">دخول</button><br>
+    <a href="#" onclick="forgotPass()">نسيت كلمة المرور؟</a><br>
+    <p>ليس لديك حساب؟ <a href="#" onclick="showSignUp()">سجل الآن</a></p>
+  </div>
+</div>
+
+<!-- Sign Up Modal -->
+<div class="modal" id="signUpModal">
+  <div class="modal-content">
+    <h2>تسجيل حساب جديد</h2>
+    <input type="text" id="newUsername" placeholder="اسم المستخدم"><br>
+    <input type="password" id="newPassword" placeholder="كلمة المرور"><br>
+    <input type="password" id="confirmPassword" placeholder="تأكيد كلمة المرور"><br>
+    <label class="checkbox-label"><input type="checkbox" id="showPassSignUp">اظهار كلمة المرور</label>
+    <button onclick="signUp()">سجل</button>
+    <p>لديك حساب؟ <a href="#" onclick="showSignIn()">تسجيل الدخول</a></p>
+  </div>
+</div>
+
+<script>
+// بيانات
+let isOwner=false;
+let currentUser='';
+let products=[];
+let cart=[];
+
+// عرض الصفحات
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.getElementById('ownerSection').style.display = (isOwner && id==='products')?'block':'none';
+  renderCart();
+}
+
+// اظهار/اخفاء كلمة المرور
+document.getElementById('showPass').addEventListener('change',function(){
+  document.getElementById('password').type=this.checked?'text':'password';
+});
+document.getElementById('showPassSignUp').addEventListener('change',function(){
+  document.getElementById('newPassword').type=this.checked?'text':'password';
+  document.getElementById('confirmPassword').type=this.checked?'text':'password';
+});
+
+// تسجيل الدخول
+function signIn(){
+  const username=document.getElementById('username').value;
+  const password=document.getElementById('password').value;
+  if(username==='ahmed' && password==='Ahmed'){
+    isOwner=true; currentUser=username;
+    alert('تم تسجيل الدخول كـ Owner');
+  } else if(localStorage.getItem(username) && localStorage.getItem(username)===password){
+    isOwner=false; currentUser=username;
+    alert('تم تسجيل الدخول كـ Client');
+  } else { alert('بيانات خاطئة'); return; }
+
+  if(!localStorage.getItem('cart_'+currentUser)) localStorage.setItem('cart_'+currentUser, JSON.stringify([]));
+
+  document.getElementById('signInModal').style.display='none';
+  showPage('home');
+}
+
+// تسجيل حساب جديد
+function signUp(){
+  const newUser=document.getElementById('newUsername').value;
+  const newPass=document.getElementById('newPassword').value;
+  const confirmPass=document.getElementById('confirmPassword').value;
+  if(!newUser || !newPass || !confirmPass) return alert('اكمل كل الحقول');
+  if(newPass!==confirmPass) return alert('كلمة المرور لا تتطابق');
+  if(localStorage.getItem(newUser)) return alert('اسم المستخدم موجود بالفعل');
+  localStorage.setItem(newUser,newPass);
+  alert('تم إنشاء الحساب! يمكنك الآن تسجيل الدخول');
+  document.getElementById('signUpModal').style.display='none';
+  showSignIn();
+}
+
+// نسيت كلمة المرور
+function forgotPass(){
+  const user=prompt('ادخل اسم المستخدم الخاص بك');
+  if(localStorage.getItem(user)) alert('كلمة المرور هي: '+localStorage.getItem(user));
+  else if(user==='ahmed') alert('كلمة المرور هي: Ahmed');
+  else alert('المستخدم غير موجود');
+}
+
+// اظهار/اخفاء المودالات
+function showSignIn(){ document.getElementById('signUpModal').style.display='none'; document.getElementById('signInModal').style.display='flex'; }
+function showSignUp(){ document.getElementById('signInModal').style.display='none'; document.getElementById('signUpModal').style.display='flex'; }
+
+// تسجيل خروج
+function logout(){ isOwner=false; currentUser=''; showSignIn(); }
+
+// إضافة منتج
+function addProduct(){
+  const name=document.getElementById('prodName').value;
+  const desc=document.getElementById('prodDesc').value;
+  const price=document.getElementById('prodPrice').value;
+  const image=document.getElementById('prodImage').files[0];
+  if(!name || !desc || !price || !image) return alert('اكمل كل الحقول');
+  const reader=new FileReader();
+  reader.onload=function(e){
+    products.push({name,desc,price,image:e.target.result});
+    renderProducts();
+  };
+  reader.readAsDataURL(image);
+}
+
+// عرض المنتجات
+function renderProducts(){
+  const container=document.getElementById('productList');
+  container.innerHTML='';
+  products.forEach((p,i)=>{
+    const card=document.createElement('div');
+    card.className='card';
+    let ownerBtns='';
+    if(isOwner){
+      ownerBtns=`<div class="owner-btns">
+        <button onclick="editProduct(${i})">Edit</button>
+        <button onclick="deleteProduct(${i})">Delete</button>
+      </div>`;
+    }
+    card.innerHTML=`<img src="${p.image}"><h3>${p.name}</h3><p>${p.desc}</p><p>${p.price} ج.م</p>
+    <button onclick="addToCart(${i})">أضف للسلّة</button>${ownerBtns}`;
+    container.appendChild(card);
+  });
+}
+
+// تعديل وحذف المنتجات (Owner)
+function deleteProduct(i){ products.splice(i,1); renderProducts(); }
+function editProduct(i){
+  const newName=prompt('اسم المنتج الجديد',products[i].name);
+  const newDesc=prompt('الوصف الجديد',products[i].desc);
+  const newPrice=prompt('السعر الجديد',products[i].price);
+  if(newName) products[i].name=newName;
+  if(newDesc) products[i].desc=newDesc;
+  if(newPrice) products[i].price=newPrice;
+  renderProducts();
+}
+
+// اضافة للعربة
+function addToCart(i){
+  let userCart=JSON.parse(localStorage.getItem('cart_'+currentUser));
+  userCart.push(products[i]);
+  localStorage.setItem('cart_'+currentUser,JSON.stringify(userCart));
+  alert('تمت الإضافة للعربة!');
+  renderCart();
+}
+
+// عرض العربة
+function renderCart(){
+  const container=document.getElementById('cartList');
+  container.innerHTML='';
+  if(!currentUser) return;
+  let userCart=JSON.parse(localStorage.getItem('cart_'+currentUser));
+  userCart.forEach((p,i)=>{ container.innerHTML+=`<p>${p.name} - ${p.price} ج.م</p>`; });
+}
+
+// ارسال رسالة
+function sendContact(){
+  alert('شكرًا على رسالتك! سيتم التواصل مع Owner على الرقم: 01286273755');
+  document.getElementById('contactName').value='';
+  document.getElementById('contactEmail').value='';
+  document.getElementById('contactMessage').value='';
+}
+
+// تشغيل تسجيل الدخول عند التحميل
+window.onload=function(){ showSignIn(); }
+</script>
+</body>
+</html>
